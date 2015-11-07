@@ -11,38 +11,43 @@
 using namespace std;
 
 //calculates the number of unique k-mers and different k-mers
-//prints out these numbers and the percentage of the gene that is discovered
-double checkHexamers(string sequence, int k){
-	vector<string> hexamers;
-	string hexamer; 
+//prints out these numbers, the percentage of the gene that is discovered,
+//length of the k-mers of the designed library and the number of bases of this library
+//when a k-mer is found on the gene, it is printed in an output file called "kmer_library.txt"
+void checkHexamers(string sequence, int k){
+	vector<string> kmers;
+	string kmer;
+	fstream output;
+	output.open("kmer_library.txt", ios::out);
 	
 	//iterates over the entire sequence
 	for (int outeri = 0; outeri < sequence.size(); outeri++){
 		if(outeri > sequence.size() - k){
 			break;
 		}
-		//iterates over 6 bases to build a hexamer
-		hexamer = "";
+		//iterates over k bases to build a k-mer
+		kmer = "";
 		for (int inneri = 0; inneri < k; inneri++){
-			hexamer += sequence[outeri];
+			kmer += sequence[outeri];
 			outeri++;
 		}
 		outeri -= k;
 		
-		hexamers.push_back(hexamer);
+		kmers.push_back(kmer);
 	}
-	cout << "Number of total hexamers: " << hexamers.size() << endl;
+	cout << "Number of total k-mers: " << kmers.size() << endl;
 
-	double size = hexamers.size();
+	double size = kmers.size();
 
-	sort(hexamers.begin(), hexamers.end());
+	//sorts the k-mers alphabetically
+	sort(kmers.begin(), kmers.end());
 	
 	double counterdiff = 0;
 	double counteruni = 0;
 	bool seen = false;
 
-	for(vector<string>::iterator iter = hexamers.begin(); iter != hexamers.end()-1; ++iter){
-		if(iter == hexamers.end()-2){
+	for(vector<string>::iterator iter = kmers.begin(); iter != kmers.end()-1; ++iter){
+		if(iter == kmers.end()-2){
 			if(*iter != *(iter+1)){
 				counteruni += 2;
 				counterdiff += 2;
@@ -56,6 +61,7 @@ double checkHexamers(string sequence, int k){
 				if(!seen){
 					counteruni++;
 					counterdiff++;
+					output << *iter << endl;
 					seen = false;
 				}
 				seen = false;
@@ -63,22 +69,28 @@ double checkHexamers(string sequence, int k){
 				if(!seen){
 					seen = true;
 					counterdiff++;
+					output << *iter << endl;
 				}
 			}
 		}
 	}
-	cout << "Number of unique hexamers: " << counteruni << endl;
-	cout << "Number of different hexamers: " << counterdiff << endl;
+	cout << "Number of unique k-mers: " << counteruni << endl;
+	cout << "Number of different k-mers: " << counterdiff << endl;
 
-	double perc = (counteruni / size)* 100;
-	cout << perc << " percent of the gene are discovered uniquely with the hexamer library." << endl;
-	return perc;
+	double perc = (counteruni / size) * 100;
+	cout << perc << " % of the gene are discovered uniquely with the k-mer library." << endl;
+	cout << "Length of the k-mers: " << k << endl;
+	cout << "Number of bases in the k-mere library: " << counterdiff * k << endl;
+
 }
 
 
+
+
 //reads in the gene file and stores the sequence in one stringstream
-//checks the coverage of the gene with the hexamer library
+//checks the coverage of the gene with the k-mer library
 //first parameter is the gene file
+//second parameter is k of the k-mers
 int main(int argc, char* argv[]){
 	fstream file;
 	file.open(argv[1], ios::in);
@@ -90,15 +102,7 @@ int main(int argc, char* argv[]){
 		getline(file, header);
 		while(getline(file, line)){
 			sequence << line;
-			}			
-	}	
-	double perc;
-	
-	for(int i = 50; i < 100; i++) {
-		perc = checkHexamers(sequence.str(), i);
-		if (perc >= 100) {
-			cout << "minimal k = " << i;
-			break;
 		}
 	}
+	checkHexamers(sequence.str(), atoi(argv[2]));
 }
