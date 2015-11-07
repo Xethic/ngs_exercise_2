@@ -12,7 +12,7 @@ using namespace std;
 
 //calculates the number of unique k-mers and different k-mers
 //prints out these numbers and the percentage of the gene that is discovered
-void checkHexamers(string sequence, int k){
+double checkHexamers(string sequence, int k){
 	vector<string> hexamers;
 	string hexamer; 
 	
@@ -70,14 +70,15 @@ void checkHexamers(string sequence, int k){
 	cout << "Number of unique hexamers: " << counteruni << endl;
 	cout << "Number of different hexamers: " << counterdiff << endl;
 
-	double perc = counteruni*6 / size * 100;
+	double perc = (counteruni / size)* 100;
 	cout << perc << " percent of the gene are discovered uniquely with the hexamer library." << endl;
+	return perc;
 }
 
 
 //reads in the gene file and stores the sequence in one stringstream
 //checks the coverage of the gene with the hexamer library
-//first parameter is the gene file, second parameter is k for the k-mer
+//first parameter is the gene file
 int main(int argc, char* argv[]){
 	fstream file;
 	file.open(argv[1], ios::in);
@@ -85,12 +86,19 @@ int main(int argc, char* argv[]){
 	string header;
 	stringstream sequence;
 
-	if(file.is_open()){
+	if(file.is_open()) {
 		getline(file, header);
 		while(getline(file, line)){
 			sequence << line;
 			}			
 	}	
+	double perc;
 	
-	checkHexamers(sequence.str(), atoi(argv[2]));
+	for(int i = 50; i < 100; i++) {
+		perc = checkHexamers(sequence.str(), i);
+		if (perc >= 100) {
+			cout << "minimal k = " << i;
+			break;
+		}
+	}
 }
