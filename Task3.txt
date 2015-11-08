@@ -14,9 +14,16 @@ a) \
 assuming that the TTN data is given in the same folder as TTN.fa.\
 \
 b)\
-4076, see above. The program prints information for all the subtasks.\
+4076, for generating, see above. The program prints information for all the subtasks.\
 \
-c) Run the program kmer using the following command: \
+c) \
+Please download the library here: \
+\
+https://dl.dropboxusercontent.com/u/16345604/kmer_library.zip\
+\
+OR\
+\
+Run the program kmer using the following command: \
 ./kmer TTN.fa 1179\
 \
 and check the generated file kmer_library.txt.\
